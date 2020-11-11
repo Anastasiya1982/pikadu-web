@@ -9,3 +9,5 @@ menuToggle.addEventListener('click', function (event) {
   // вешаем класс на меню, когда кликнули по кнопке меню 
   menu.classList.toggle('visible');
 })
+
+
