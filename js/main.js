@@ -61,12 +61,18 @@ const setUsers= {
   logOut() {
     console.log('logOut')
   },
-  signUp(email, password,handler) {
+  signUp(email, password, handler) {
+
+    if (!email.trim() || !password.trim()) {
+      alert('Введите данные');
+      return;
+    }
     if (!this.getUser(email)) {
+      // cоздаем юзера чтоб добавить в список
       const user = {email, password, displayName: email}
-      listUsers.push(user);
-      this.autorizedUser(user);
-      handler();
+      listUsers.push(user);// добавляем юзера
+      this.autorizedUser(user);// авторизация
+      handler();// функция toggleAuthDom  при авторизации меняются блоки
     } else {
       alert("Пользователь с таким email уже зарегистрирован");
     }
@@ -110,8 +116,7 @@ loginForm.addEventListener('submit',(event)=>{
   const emailValue=emailInput.value;
   const passwordValue=passwordInput.value;
   setUsers.logIn(emailValue, passwordValue, toggleAuthDom);
-
-
+  loginForm.reset();
 })
 
 
@@ -122,6 +127,7 @@ loginSignup.addEventListener('click',(event)=>{
   const passwordValue=passwordInput.value;
 
   setUsers.signUp(emailValue, passwordValue, toggleAuthDom);
+  loginForm.reset();
 
 })
 toggleAuthDom();

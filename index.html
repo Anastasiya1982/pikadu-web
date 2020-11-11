@@ -209,18 +209,39 @@
         </form>      
       </div>
       <div class="user">
+      <div class="user-container">
         <a href="#" class="user-info">
           <img width="40" height="40" src="img/avatar.jpeg" alt="photo: user" class="user-avatar">
           <span class="user-name">islamovartem</span>
         </a>
         <!-- /.user-info -->
+        <a href="#" class="edit">
+          <img class="icon icon-edit" src="img/edit.png" alt="редактировать">
+        </a>
         <a href="#" class="exit">
           <svg class="icon icon-exit">
             <use xlink:href="img/icons.svg#exit"></use>
           </svg>
         </a>
-        <!-- /.exit -->
       </div>
+        <div class="edit-container">
+        <h2 class="edit-title">Редактировать </h2>
+        <lable class="edit-lable">Ваш логин
+          <input type="text" class="edit-input edit-username"
+                 name="username"
+                 minlength="3"
+                 placeholder="логин">
+        </lable>
+        <lable class="edit-lable">Вашe фото
+          <input type="text" class="edit-input edit-photoe"
+                 name="photo"
+                 minlength="3"
+                 placeholder="URL-photo">
+        </lable>
+        <button class="edit-btn">Сохранить</button>
+      </div>
+      <!-- /.exit -->
+    </div>
       <!-- /.user -->
       <nav class="sidebar-nav">
         <ul class="sidebar-menu">
