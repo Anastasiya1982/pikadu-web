@@ -3,14 +3,8 @@ let menuToggle = document.querySelector('#menu-toggle');
 // Создаем переменную, в которую положим меню
 let menu = document.querySelector('.sidebar');
 // отслеживаем клик по кнопке меню и запускаем функцию
-menuToggle.addEventListener('click', function (event) {
-  // отменяем стандартное поведение ссылки
-  event.preventDefault();
-  // вешаем класс на меню, когда кликнули по кнопке меню
-  menu.classList.toggle('visible');
-})
 
-
+const regExpValidEmail=/^\w+@\w+\.\w{2,}$/;//  валидация для емейла  регулярным выражением
 // создаем перменные для получения элементов блока логинизации
 
 const loginElem = document.querySelector('.login');
@@ -23,6 +17,15 @@ const loginSignup=document.querySelector('.login-signup');
 const userElem = document.querySelector('.user');
 const userNameElem = document.querySelector('.user-name');
 
+const exitElem=document.querySelector('.exit');
+const editElem=document.querySelector('.edit');
+const editContainer=document.querySelector('.edit-container');
+const editUsername=document.querySelector('.edit-username');
+const editPhotoUrl=document.querySelector('.edit-photo');
+const userAvatarElem = document.querySelector('.user-avatar');
+
+
+const postsWrapper=document.querySelector('.posts');
 // создаем массив юзеров пока нет базы данных
 const listUsers=[
   {
@@ -49,7 +52,13 @@ const listUsers=[
 const setUsers= {
   user: null,
   //добавляем методы
+  // войти авторизованному пользователю
   logIn(email, password,handler) {
+    if(!regExpValidEmail.test(email)) {
+      alert('email не валиден');
+      return;
+    }
+
    const user=this.getUser(email);
    if(user && user.password===password){
      this.autorizedUser(user);
@@ -58,18 +67,24 @@ const setUsers= {
      alert('Пользователь с такими данными не найден');
    }
   },
-  logOut() {
-    console.log('logOut')
+  logOut(handler) {
+    this.user=null;
+    handler();
   },
+  //регистрация
   signUp(email, password, handler) {
 
     if (!email.trim() || !password.trim()) {
       alert('Введите данные');
       return;
     }
+    if (!regExpValidEmail.test(email)) {
+      alert('email не валиден');
+      return;
+    }
     if (!this.getUser(email)) {
       // cоздаем юзера чтоб добавить в список
-      const user = {email, password, displayName: email}
+      const user = {email, password, displayName: email.substring(0,email.indexOf('@'))};
       listUsers.push(user);// добавляем юзера
       this.autorizedUser(user);// авторизация
       handler();// функция toggleAuthDom  при авторизации меняются блоки
@@ -93,9 +108,43 @@ const setUsers= {
   },
   autorizedUser(user){
     this.user=user;
-  }
+  },
+  editUser(userName, userPhoto,handler) {
+    if(userName){
+      this.user.displayName=userName;
+    }
+    if(userPhoto){
+      this.user.photo=userPhoto;
+    }
+    handler();
+  },
 };
 // функция переключения авторизации ( меняем login  на user )
+
+const setPosts={
+  allPost:[
+    {
+      title:"Заголовок поста",
+      text:"Далеко-далеко за словесными горами в стране гласных и согласных живут рыбные тексты. Языком что рот маленький реторический вершину текстов обеспечивает гор свой назад решила сбить маленькая дорогу жизни рукопись ему букв деревни предложения, ручеек залетают продолжил парадигматическая? Но языком сих пустился, запятой своего егo снова решила меня вопроса моей своих пояс коварный, власти диких правилами напоивший они текстов ipsum первую подпоясал? Лучше, щеке подпоясал приставка большого курсивных на берегу своего? Злых, составитель агентство что ведущими о решила одна алфавит!",
+      tags:['свежее', 'новое', 'горячее','vjt'],
+      author:'mahanasty@mail.com',
+      date:"11.11.2020, 22:54:00",
+      like:45,
+      comments:20,
+    },
+    {
+      title:"Заголовок поста",
+      text:"Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda consequuntur dolores hic itaque iure labore magnam nobis quo sit vitae? Accusantium, animi consectetur corporis deserunt dignissimos, ea error, impedit maxime molestiae mollitia nam nemo placeat quas qui tempora vitae voluptate. Aliquam commodi corporis culpa deleniti, doloremque eum eveniet facere ipsum iste laborum maxime, modi nulla pariatur ratione saepe sit tempora",
+      tags:['свежее', 'новое', 'горячее','vjt' ],
+      author:'maksLeskin@mail.com',
+      date:"10.11.2020, 18:54:00",
+      comments:10,
+      like:15,
+    }
+  ]
+};
+
+
 const toggleAuthDom =()=>{
   const user = setUsers.user;
   console.log(user);
@@ -104,31 +153,125 @@ const toggleAuthDom =()=>{
     loginElem.style.display = 'none';
     userElem.style.display = '';
     userNameElem.textContent = user.displayName;
+    userAvatarElem.src = user.photo ? user.photo : userAvatarElem.src;
   } else {
     loginElem.style.display = '';
     userElem.style.display = 'none';
   }
 };
 
+const showAllPosts=()=>{
 
-loginForm.addEventListener('submit',(event)=>{
-  event.preventDefault();
-  const emailValue=emailInput.value;
-  const passwordValue=passwordInput.value;
-  setUsers.logIn(emailValue, passwordValue, toggleAuthDom);
-  loginForm.reset();
+  let postsTML = "";
+
+  setPosts.allPost.forEach(({ title, text, data }) => {
+
+    // const { title, text, data } = post;
+
+    postsTML += `
+         <section class="post">
+        <div class="post-body">
+          <h2 class="post-title">${title}</h2>
+          <p class="post-text">${text} </p>
+        <div class="tags">пше              
+            <a href="#" class="tag">#свежее</a>
+          </div>         
+        </div>       
+        <div class="post-footer">
+          <div class="post-buttons">
+            <button class="post-button likes">
+              <svg width="19" height="20" class="icon icon-like">
+                <use xlink:href="img/icons.svg#like"></use>
+              </svg>
+              <span class="likes-counter">26</span>
+            </button>
+            <button class="post-button comments">
+              <svg width="21" height="21" class="icon icon-comment">
+                <use xlink:href="img/icons.svg#comment"></use>
+              </svg>
+              <span class="comments-counter">157</span>
+            </button>
+            <button class="post-button save">
+              <svg width="19" height="19" class="icon icon-save">
+                <use xlink:href="img/icons.svg#save"></use>
+              </svg>
+            </button>
+            <button class="post-button share">
+              <svg width="17" height="19" class="icon icon-share">
+                <use xlink:href="img/icons.svg#share"></use>
+              </svg>
+            </button>
+          </div>
+        
+          <div class="post-author">
+            <div class="author-about">
+              <a href="#" class="author-username">arteislamov</a>
+              <span class="post-time">${data}</span>
+            </div>
+            <a href="#" class="author-link"><img src="img/avatar.jpeg" alt="avatar" class="author-avatar"></a>
+          </div>
+         
+        </div>
+      
+      </section>    
+    `
+  })
+
+    postsWrapper.innerHTML = postsTML;
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  init();
 })
 
 
-loginSignup.addEventListener('click',(event)=>{
-  event.preventDefault();
+const init=()=>{
+  loginForm.addEventListener('submit',(event)=>{
+    event.preventDefault();
+    const emailValue=emailInput.value;
+    const passwordValue=passwordInput.value;
+    setUsers.logIn(emailValue, passwordValue, toggleAuthDom);
+    loginForm.reset();
+  })
 
-  const emailValue=emailInput.value;
-  const passwordValue=passwordInput.value;
 
-  setUsers.signUp(emailValue, passwordValue, toggleAuthDom);
-  loginForm.reset();
+  loginSignup.addEventListener('click',(event)=>{
+    event.preventDefault();
 
-})
-toggleAuthDom();
+    const emailValue=emailInput.value;
+    const passwordValue=passwordInput.value;
+
+    setUsers.signUp(emailValue, passwordValue, toggleAuthDom);
+    loginForm.reset();
+
+  })
+  exitElem.addEventListener('click',event=> {
+    event.preventDefault();
+    setUsers.logOut(toggleAuthDom);
+  });
+
+  editElem.addEventListener("click",event=>{
+    event.preventDefault();
+    editContainer.classList.toggle('visible');
+    editUsername.value=setUsers.user.displayName;
+  });
+
+  editContainer.addEventListener('submit', event=>{
+    event.preventDefault();
+
+    setUsers.editUser(editUsername.value,editPhotoUrl.value,toggleAuthDom);
+    editContainer.classList.remove('visible');
+  });
+
+  menuToggle.addEventListener('click', function (event) {
+    // отменяем стандартное поведение ссылки
+    event.preventDefault();
+    // вешаем класс на меню, когда кликнули по кнопке меню
+    menu.classList.toggle('visible');
+  })
+
+  showAllPosts();
+  toggleAuthDom();
+}
+
 
